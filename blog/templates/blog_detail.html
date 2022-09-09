@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load markdownify %}
+
+{% block title %}{{ post.title }}{% endblock title %}
+{% block meta_description %}{{ post.meta_description }}{% endblock meta_description %}
+
+{% block page_content %}
+<div class="col-md-8 offset-md-2">
+    <h1>{{ post.title }}</h1>
+    <small>
+        {{ post.created_on.date }} |&nbsp;
+        Categories:&nbsp;
+        {% for category in post.categories.all %}
+        <a href="{% url 'blog_category' category.slug %}">
+            {{ category.name }}
+        </a>&nbsp;
+        {% endfor %}
+    </small>
+    <small>
+        {{ comment | length }}
+    </small>
+
+    <div>{{ post.body | markdownify | linebreaks }}</div>
+
+    <h3>Leave a comment:</h3>
+    <form action="{{ post.slug }}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.author }}
+        </div>
+        <div class="form-group">
+            {{ form.body }}
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    <h3>Comments:</h3>
+    {% for comment in comments %}
+    <p>
+        On {{comment.created_on.date }}&nbsp;
+        <b>{{ comment.author }}</b> wrote:
+    </p>
+    <p>{{ comment.body }}</p>
+    <hr>
+    {% endfor %}
+</div>
+{% endblock %}
